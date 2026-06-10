@@ -1,34 +1,40 @@
 import org.apache.spark.sql.SparkSession
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path, FileUtil}
+import java.util.Properties
 
 object Producer {
 
   def main(args: Array[String]): Unit = {
 
+    val props = new Properties()
+
+    props.load(
+      getClass.getClassLoader.getResourceAsStream("app.properties")
+    )
+
     val spark = SparkSession.builder()
-        .appName("TestApp")
-        .master("local[*]")
+        .appName(props.getProperty("app.name"))
+        .master(props.getProperty("app.master"))
         .getOrCreate()
 
     spark.sparkContext.setLogLevel("ERROR")
 
     val fs = FileSystem.get(spark.sparkContext.hadoopConfiguration)
 
-    val frequency = 5
-    val batch = 2
-    val loops = 10
-    var loopCount = 0
+    val inputPath = props.getProperty("producer.input.path")
+    val outputPath = props.getProperty("producer.output.path")
+    val frequency = props.getProperty("producer.frequency").toInt
+    val batch = props.getProperty("producer.batch").toInt
+    val loop = props.getProperty("producer.loop", "false").toBoolean
+    val debug = props.getProperty("debug").toBoolean
 
-    while (loopCount < loops) {
-      copyFiles(fs ,frequency, batch, spark.sparkContext.hadoopConfiguration)
-      loopCount += 1
-    }
+    copyFiles(fs, inputPath, outputPath, frequency, batch, spark.sparkContext.hadoopConfiguration, loop, debug)
     
     spark.stop()
   }
 
-  def copyFiles(fs: FileSystem, frequency: Int, batch: Int, conf: Configuration) {
+  def copyFiles(fs: FileSystem, inputPath: String, outputPath: String, frequency: Int, batch: Int, conf: Configuration, loop: Boolean = false, debug: Boolean = false) {
     fs.listStatus(new Path("data/source")).grouped(batch)
       .foreach { batch => 
         batch.foreach { status =>
@@ -38,7 +44,7 @@ object Producer {
           val destination =
             new Path("data/input", System.currentTimeMillis() + "_" + file.getName)
 
-          println(s"Copying File: ${file.getName}")
+          if (debug) { println(s"Copying File: ${file.getName}") }
 
           FileUtil.copy(
             fs, file,          // source file
@@ -47,9 +53,12 @@ object Producer {
             conf
           )
         }
-        println("----------- END OF BATCH ------------")
+        if (debug) { println("----------- END OF BATCH ------------") }
         Thread.sleep(frequency * 1000)
       }
+    if (loop) {
+      copyFiles(fs, inputPath, outputPath, frequency, batch, conf, loop)
+    }
   }
 
 }
