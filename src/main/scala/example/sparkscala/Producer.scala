@@ -68,7 +68,8 @@ object Producer {
     if (recursive) {
       val directories = fs.listStatus(new Path(inputPath)).filter(_.isDirectory)
       directories.foreach { directory =>
-        copyFiles(inputPath + "/" + directory, outputPath + "/" + directory)
+        if (debug) { println("Directory being copied: " + directory.getPath.getName) }
+        copyFiles(inputPath + "/" + directory.getPath.getName, outputPath + "/" + directory.getPath.getName)
       }
     }
     
