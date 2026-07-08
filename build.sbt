@@ -1,4 +1,33 @@
-// give the user a nice default project!
+import java.io.File
+
+def loadDotEnv(path: String = ".env"): Map[String, String] = {
+  val file = new File(path)
+  if (file.exists()) {
+    val lines = scala.io.Source.fromFile(file).getLines().toList
+    lines
+      .map(_.trim)
+      .filter(line => line.nonEmpty && !line.startsWith("#"))
+      .flatMap { line =>
+        line.split("=", 2) match {
+          case Array(k, v) => Some(k.trim -> v.trim)
+          case _           => None
+        }
+      }
+      .toMap
+  } else {
+    Map.empty
+  }
+}
+
+val dotEnv = loadDotEnv()
+
+val java11Home: Option[String] = dotEnv.get("JAVA11_HOME").orElse(sys.env.get("JAVA11_HOME"))
+
+val warnIfMissingJavaHome: Unit = if (java11Home.isEmpty) {
+  println("[build.sbt] ATTENTION: JAVA11_HOME non trouvé (ni dans .env, ni dans l'environnement). " +
+    "Spark risque de rencontrer le bug de compatibilité Java 17. " +
+    "Crée un fichier .env à la racine avec: JAVA11_HOME=/chemin/vers/ton/jdk11")
+}
 
 lazy val root = (project in file(".")).
 
@@ -9,6 +38,8 @@ lazy val root = (project in file(".")).
     )),
     name := "sparkScala",
     version := "0.0.1",
+
+    javaHome := java11Home.map(file(_)),
 
     javaOptions ++= Seq(
       "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED",
@@ -25,12 +56,15 @@ lazy val root = (project in file(".")).
       "org.apache.spark" %% "spark-streaming" % "3.5.1" % "provided",
       "org.apache.spark" %% "spark-sql" % "3.5.1" % "provided",
 
+      "com.microsoft.onnxruntime" % "onnxruntime" % "1.18.0",
+
       "org.scalatest" %% "scalatest" % "3.2.2" % "test",
       "org.scalacheck" %% "scalacheck" % "1.15.2" % "test",
     ),
 
-    // uses compile classpath for the run task, including "provided" jar (cf http://stackoverflow.com/a/21803413/3827)
     run in Compile := Defaults.runTask(fullClasspath in Compile, mainClass in (Compile, run), runner in (Compile, run)).evaluated,
+
+    runMain in Compile := Defaults.runMainTask(fullClasspath in Compile, runner in (Compile, run)).evaluated,
 
     scalacOptions ++= Seq("-deprecation", "-unchecked"),
     pomIncludeRepository := { x => false },
@@ -42,7 +76,7 @@ lazy val root = (project in file(".")).
       Resolver.sonatypeRepo("public")
     ),
 
-    // publish settings
+
     publishTo := {
       val nexus = "https://oss.sonatype.org/"
       if (isSnapshot.value)
