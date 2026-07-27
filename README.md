@@ -25,6 +25,17 @@ Voici l'organisation des fichiers et dossiers du projet :
 
 ```text
 .
+├── app/
+│   ├── pages/
+│   │   ├── 1_📊_Vue_generale.py
+│   │   ├── 2_🎯_Qualite_modele.py
+│   │   ├── 3_🖼️_Analyse_images.py
+│   │   └── 4_⚡_Performance_pipeline.py
+│   ├── utils/
+│   │   ├── __init__.py
+│   │   ├── data_loader.py
+│   │   └── metrics.py
+│   └── home.py
 ├── data/
 │   ├── input/
 │   └── source/
@@ -76,6 +87,13 @@ Avant de lancer le projet, assurez-vous d'avoir installé :
 
 -  Apache Spark (Si exécuté en dehors du mode local[*])
 
+-  Python (pour le streamlit) avec packages :
+    - pandas
+    - plotly
+    - streamlit
+    - streamlit_autorefresh
+    - utils
+
 ## 🚀 Installation et Configuration
 Cloner le projet :
 
@@ -92,4 +110,6 @@ Compiler et lancer le projet :
 sbt clean compile
 sbt run
 ```
+
+Il faut lancer deux fois - une pour le producer, et une autre pour le consumer
 
