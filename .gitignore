@@ -151,3 +151,4 @@ docs/_build/
 *~
 
 data/
+.venv/
