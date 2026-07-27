@@ -27,8 +27,14 @@ Voici l'organisation des fichiers et dossiers du projet :
 .
 ├── app/
 │   ├── pages/
-│   |   ├── _analyse.py
-│   |   ├── _performance.py
+│   │   ├── 1_📊_Vue_generale.py
+│   │   ├── 2_🎯_Qualite_modele.py
+│   │   ├── 3_🖼️_Analyse_images.py
+│   │   └── 4_⚡_Performance_pipeline.py
+│   ├── utils/
+│   │   ├── __init__.py
+│   │   ├── data_loader.py
+│   │   └── metrics.py
 │   └── home.py
 ├── data/
 │   ├── input/
