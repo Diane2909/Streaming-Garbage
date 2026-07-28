@@ -7,7 +7,7 @@ st_autorefresh(interval=3000, key="refresh_images")
 
 df = load_json_folder()
 
-st.title("🖼️ Analyse des images")
+st.title("Analyse des images")
 
 col1, col2 = st.columns(2)
 

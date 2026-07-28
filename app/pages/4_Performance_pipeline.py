@@ -10,7 +10,7 @@ st_autorefresh(interval=2000, key="refresh_perf")
 
 df = load_json_folder()
 
-st.title("⚡ Performance du pipeline")
+st.title("Performance du pipeline")
 
 p50 = df["delay_ms"].quantile(0.50)
 p95 = df["delay_ms"].quantile(0.95)

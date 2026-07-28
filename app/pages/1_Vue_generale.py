@@ -9,7 +9,7 @@ st_autorefresh(interval=3000, key="refresh_general")
 df = load_json_folder()
 kpi = compute_kpis(df)
 
-st.title("📊 Vue générale")
+st.title("Vue générale")
 
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Images analysées", kpi["total"])

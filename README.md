@@ -1,10 +1,10 @@
-# Streaming Garbage ♻️
+# Streaming Garbage
 
 **Streaming Garbage** est un projet d'analyse en temps réel et de classification automatique des déchets conçu avec **Apache Spark Structured Streaming** et **Scala**. Le système s'appuie sur une architecture Producteur/Consommateur pour traiter des flux de données et classifier les objets dans six catégories de tri sélectif distinctes.
 
 ---
 
-## 📋 Table des Matières
+## Table des Matières
 1. [Fonctionnalités](#-fonctionnalités)
 2. [Structure du Projet](#-structure-du-projet)
 3. [Prérequis](prerequis)
@@ -12,14 +12,14 @@
 
 ---
 
-## ✨ Fonctionnalités
+## Fonctionnalités
 * **Producer (Producteur) :** Simule ou capture un flux continu de données concernant les objets jetés et les envoie vers un système de messagerie (ex: Apache Kafka ou un flux de fichiers).
 * **Consumer / Classifier (Consommateur) :** Utilise Spark Structured Streaming pour consommer le flux de données en temps réel, appliquer un modèle de classification et distribuer les résultats.
 * **Classification Multi-classes :** Répartition automatique des déchets dans 6 flux de tri optimisés.
 
 ---
 
-## 📂 Structure du Projet
+## Structure du Projet
 
 Voici l'organisation des fichiers et dossiers du projet :
 
@@ -27,10 +27,10 @@ Voici l'organisation des fichiers et dossiers du projet :
 .
 ├── app/
 │   ├── pages/
-│   │   ├── 1_📊_Vue_generale.py
-│   │   ├── 2_🎯_Qualite_modele.py
-│   │   ├── 3_🖼️_Analyse_images.py
-│   │   └── 4_⚡_Performance_pipeline.py
+│   │   ├── 1_Vue_generale.py
+│   │   ├── 2_Qualite_modele.py
+│   │   ├── 3_Analyse_images.py
+│   │   └── 4_Performance_pipeline.py
 │   ├── utils/
 │   │   ├── __init__.py
 │   │   ├── data_loader.py
@@ -94,7 +94,7 @@ Avant de lancer le projet, assurez-vous d'avoir installé :
     - streamlit_autorefresh
     - utils
 
-## 🚀 Installation et Configuration
+## Installation et Configuration
 Cloner le projet :
 
 ```Bash
