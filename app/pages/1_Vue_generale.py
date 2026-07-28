@@ -31,10 +31,44 @@ with col2:
 
 st.divider()
 
-fig = px.line( df.sort_values("processTime"), x="processTime", y="delay_seconds", title="Evolution du temps de traitement" )
+df_per_sec = (
+    df
+    .set_index("processTime")
+    .resample("1s")
+    .agg(
+        mean_delay=("delay_seconds", "mean")
+    ).dropna()
+    .reset_index()
+)
+
+fig = px.line( df_per_sec, x="processTime", y="mean_delay", title="Evolution du temps de traitement" )
 st.plotly_chart(fig, width='stretch')
 
 st.divider()
 
 fig = px.histogram( df, x="confidence", nbins=30, title="Distribution des confiances" )
 st.plotly_chart(fig, width='stretch')
+
+st.subheader("Dernières Images Traitées")
+df_recent = df.sort_values("processTime").head(50)
+
+event = st.dataframe(
+    df_recent[
+        ["path", "true_label", "predicted_class", "confidence", "processTime"]
+    ],
+    width="stretch",
+    on_select="rerun",
+    selection_mode="single-row"
+)
+
+if event.selection.rows:
+
+    idx = event.selection.rows[0]
+
+    row = df_recent.iloc[idx]
+
+    image_path = row["path"].replace("file:", "")
+
+    st.image(image_path, caption=image_path)
+
+    st.write(row)
