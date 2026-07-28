@@ -64,7 +64,7 @@ object Producer {
             file, // source file
             fs,
             destination, // destination file
-            true, // delete source (pick up where it left off last time)
+            false, // don't delete source
             spark.sparkContext.hadoopConfiguration
           )
         }
