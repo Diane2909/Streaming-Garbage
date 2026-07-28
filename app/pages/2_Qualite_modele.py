@@ -9,7 +9,7 @@ st_autorefresh(interval=3000, key="refresh_quality")
 
 df = load_json_folder()
 
-st.title("🎯 Qualité du modèle")
+st.title("Qualité du modèle")
 
 fig = px.histogram(
     df,
