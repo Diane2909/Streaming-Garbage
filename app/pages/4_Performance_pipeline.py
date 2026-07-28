@@ -18,7 +18,11 @@ p99 = df["delay_ms"].quantile(0.99)
 
 now = pd.Timestamp.now(tz="Europe/Paris")
 
-throughput = len(df[df["processTime"] > now - timedelta(seconds=10)]) / 10
+latest = df["processTime"].max()
+if latest > now - timedelta(seconds=20):
+    throughput = len(df[df["processTime"] > (latest - timedelta(seconds=10))]) / 10
+else:
+    throughput = 0
 
 c1, c2, c3, c4, c5, c6 = st.columns(6)
 c1.metric(
@@ -70,6 +74,31 @@ st.plotly_chart(fig2, width='stretch')
 
 st.divider()
 
+df_new_recent = df[
+    df["modificationTime"].dt.floor("min") > now - timedelta(minutes=5)
+]
+
+df_new_per_sec = (
+    df_new_recent
+    .set_index("modificationTime")
+    .resample("1s")
+    .agg(
+        new_images=("path", "count")
+    ).dropna()
+    .reset_index()
+)
+
+fig = px.line(
+    df_new_per_sec,
+    x="modificationTime",
+    y="new_images",
+    title="Nouvelles images par seconde"
+)
+
+st.plotly_chart(fig, width='stretch')
+
+st.divider()
+
 df_recent["minute"] = df_recent["processTime"].dt.floor("min")
 throughput_df = df_recent.groupby("minute").size().reset_index(name="images")
 
@@ -85,5 +114,3 @@ st.divider()
 
 fig = px.box( df, x="true_label", y="delay_ms", color="true_label", title="Temps de traitement par catégorie" )
 st.plotly_chart(fig, width='stretch')
-
-st.dataframe( df, width='stretch' )

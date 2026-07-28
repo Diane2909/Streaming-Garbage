@@ -46,6 +46,7 @@ object Producer {
     files
       .grouped(batch)
       .foreach { batch =>
+        val start = System.currentTimeMillis()
         batch.foreach { status =>
           val file = status.getPath
 
@@ -64,12 +65,19 @@ object Producer {
             file, // source file
             fs,
             destination, // destination file
-            true, // delete source (pick up where it left off last time)
+            false, // don't delete source
             spark.sparkContext.hadoopConfiguration
           )
         }
         if (debug) { println("----------- END OF BATCH ------------") }
-        Thread.sleep(frequency * 1000)
+        val elapsed = System.currentTimeMillis() - start
+
+        val waitTime =
+          frequency * 1000 - elapsed
+
+        if (waitTime > 0) {
+          Thread.sleep(waitTime)
+        }
       }
 
     if (recursive) {
