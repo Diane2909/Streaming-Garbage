@@ -76,18 +76,18 @@ object Consumer {
       .load(inputPath)
 
     val withPathInfo = if (extractLabelFromPath) {
-      val extractLabelUdf = udf { path: String =>
-        val parts = path.split("/")
-        if (parts.length >= 2) parts(parts.length - 2) else "unknown"
-      }
-      val extractSplitUdf = udf { path: String =>
-        val parts = path.split("/")
-        if (parts.length >= 3) parts(parts.length - 3) else "unknown"
-      }
+      val pathParts = split($"path", "/")
+      val partsLen = size(pathParts)
 
       rawStream
-        .withColumn("true_label", extractLabelUdf($"path"))
-        .withColumn("split", extractSplitUdf($"path"))
+        .withColumn(
+          "true_label",
+          when(partsLen >= 2, element_at(pathParts, -2)).otherwise(lit("unknown"))
+        )
+        .withColumn(
+          "split",
+          when(partsLen >= 3, element_at(pathParts, -3)).otherwise(lit("unknown"))
+        )
     } else {
       rawStream
         .withColumn("true_label", lit(null: String))
